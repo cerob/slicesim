@@ -1,0 +1,61 @@
+num_clients: 3
+num_base_stations: 3
+slices:
+  - iot:
+    delay_tolerance: 10
+    qos_class: 2
+    bandwidth_guaranteed: 10
+    bandwidth_max: 1000
+  - data:
+    delay_tolerance: 2000
+    qos_class: 4
+    bandwidth_guaranteed: 1000
+    bandwidth_max: 50000
+base_stations:
+  -
+    x: 0
+    y: 0
+    coverage: 25
+    capacity_bandwidth: 1000
+    ratios:
+      - iot: 0.4
+      - data: 0.6
+  -
+    x: 15
+    y: 25
+    coverage: 30
+    capacity_bandwidth: 1400
+    ratios:
+      - iot: 0.2
+      - data: 0.8
+  -
+    x: -14
+    y: -20
+    coverage: 15
+    capacity_bandwidth: 700
+    ratios:
+      - iot: 0.24
+      - data: 0.76
+mobility_patterns:
+  - normal_btw_0_1000:
+    distribution: normal
+    params:
+      - 0
+      - 10
+  - basic:
+    distribution: randomInt
+    params:
+      - 0
+      - 5
+clients:
+  location:
+    x:
+      distribution: randomInt
+      params:
+        - -1000
+        - 1000
+    y:
+      distribution: randomInt
+      params:
+        - -800
+        - 900
