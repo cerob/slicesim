@@ -2,15 +2,15 @@ num_clients: 3
 num_base_stations: 3
 slices:
   - iot:
-    delay_tolerance: 10
-    qos_class: 2
-    bandwidth_guaranteed: 10
-    bandwidth_max: 1000
+      delay_tolerance: 10
+      qos_class: 2
+      bandwidth_guaranteed: 10
+      bandwidth_max: 1000
   - data:
-    delay_tolerance: 2000
-    qos_class: 4
-    bandwidth_guaranteed: 1000
-    bandwidth_max: 50000
+      delay_tolerance: 2000
+      qos_class: 4
+      bandwidth_guaranteed: 1000
+      bandwidth_max: 50000
 base_stations:
   -
     x: 0
@@ -38,15 +38,15 @@ base_stations:
       - data: 0.76
 mobility_patterns:
   - normal_btw_0_1000:
-    distribution: normal
-    params:
-      - 0
-      - 10
+      distribution: normal
+      params:
+        - 0
+        - 10
   - basic:
-    distribution: randomInt
-    params:
-      - 0
-      - 5
+      distribution: randomInt
+      params:
+        - 0
+        - 5
 clients:
   location:
     x:

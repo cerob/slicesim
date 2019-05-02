@@ -2,13 +2,14 @@ import math
 import random
 import simpy
 import yaml #TODO
+import numpy as np
 
 
 class Coverage:
     def __init__(self, center, radius):
         self.center = center
         self.radius = radius
-    
+
     def _get_gaussian_distance(self, p):
         return math.sqrt(sum((i-j)**2 for i,j in zip(p, self.center)))
 
@@ -28,7 +29,7 @@ class MobilityPattern:
         self.name = name
         self.distribution = distribution
         self.dist_params = dist_params
-    
+
     def generate_movement(self):
         x = self.distribution(*self.dist_params)
         y = self.distribution(*self.dist_params)
@@ -40,7 +41,7 @@ class Client:
         self.y = y
         self.mobility_pattern = mobility_pattern
         self.base_station = base_station
-    
+
     def connect_to_closest_base_station():
         self.base_station = None #TODO
 
@@ -62,48 +63,52 @@ class Slice:
 def r():
     return random.randint(0, 1000)
 
+def get_dist(d):
+    dists = {
+        'normal': np.random.normal,
+        'randInt': random.randint,
+    }
+    return dists[d]
+
 
 def run(env):
     pass
 
 
 if __name__ == '__main__':
+
+    # Read YAML file
+    with open("examples/example-input.yml", 'r') as stream:
+        data = yaml.load(stream)
+
+    # print(data)
     random.seed()
     env = simpy.Environment()
 
-    SLICES_INFO = {
-        'iot': {
-            'delay_tolerance': 10,
-            'qos_class': 2,
-            'bandwidth_guaranteed': 10,
-            'bandwidth_max': 1000,
-        },
-        'data': {
-            'delay_tolerance': 2000,
-            'qos_class': 4,
-            'bandwidth_guaranteed': 1000,
-            'bandwidth_max': 50000,
-        },
-    }
-    NUM_CLIENTS = 3
-    NUM_BASE_STATIONS = 3
+    SLICES_INFO = data['slices']
+    NUM_CLIENTS = data['num_clients'] # 3
+    NUM_BASE_STATIONS = data['num_base_stations'] # 3
+    MOBILITY_PATTERNS = data['mobility_patterns']
+    BASE_STATIONS = data['base_stations']
+    CLIENTS = data['clients']
 
-    mobility_pattern = MobilityPattern('mb', random.randint, -10, 10)
+    mobility_patterns = []
+    for name, mb in MOBILITY_PATTERNS.items():
+        mobility_pattern = MobilityPattern(name, get_dist(mb['distribution']), -10, 10)
 
     base_stations = []
-    for i in range(NUM_BASE_STATIONS):
+    for b in BASE_STATIONS:
         slices = []
-        j, ratios = 0, [0.4, 0.6]
-        capacity = 1000
+        ratios = b['ratios']
+        capacity = b['capacity_bandwidth']
         for name, s in SLICES_INFO.items():
-            s_cap = capacity * ratios[j]
-            s = Slice(name, ratios[j], None, s['delay_tolerance'],
+            s_cap = capacity * ratios[name]
+            s = Slice(name, ratios[name], None, s['delay_tolerance'],
                       s['qos_class'], s['bandwidth_guaranteed'],
                       s['bandwidth_max'], s_cap)
             s.capacity = simpy.Container(env, init=s_cap, capacity=s_cap)
             slices.append(s)
-            j += 1
-        b = BaseStation(r(), r(), Coverage(r(), r()), capacity, slices)
+        b = BaseStation(b['x'], b['y'], Coverage((b['x'], b['y']), b['coverage'], capacity, slices)
         base_stations.append(b)
 
     clients = []
