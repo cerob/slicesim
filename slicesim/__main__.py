@@ -2,6 +2,8 @@ import math
 import os
 import random
 
+from shapely.geometry import Point, MultiPoint
+from shapely.ops import nearest_points
 import numpy as np
 import simpy
 import yaml
@@ -12,6 +14,9 @@ from .Coverage import Coverage
 from .Distributor import Distributor
 from .Slice import Slice
 
+from .utils import kdtree, distance
+
+BS_POINTS = []
 
 def r():
     return random.randint(0, 1000)
@@ -24,6 +29,25 @@ def get_dist(d):
         'randInt': random.randint,
     }
     return dists[d]
+
+def shapely(client):
+
+    origin = Point(client.x, client.y)
+    nearest_geoms = nearest_points(origin, BS_POINTS)
+    near_idx0 = nearest_geoms[0]
+
+    near_idx1 = nearest_geoms[1]
+
+
+    b = bs_dict.get((near_idx1.x, near_idx1.y))
+    d = near_idx0.distance(near_idx1)
+
+    # print("a = ", near_idx0)
+    # print(d)
+    # print("b = ", near_idx1)
+
+    if d <= b.coverage.radius:
+        client.base_station = b
 
 
 def get_random_mobility_pattern(vals, mobility_patterns):
@@ -64,8 +88,6 @@ MOBILITY_PATTERNS = data['mobility_patterns']
 BASE_STATIONS = data['base_stations']
 CLIENTS = data['clients']
 
-
-
 collected, slice_weights = 0, []
 for __, s in SLICES_INFO.items():
     collected += s['weight']
@@ -81,9 +103,9 @@ for name, mb in MOBILITY_PATTERNS.items():
     mobility_pattern = Distributor(name, get_dist(mb['distribution']), *mb['params'])
     mobility_patterns.append(mobility_pattern)
 
-
 base_stations = []
 i = 0
+bs_dict = {}
 for b in BASE_STATIONS:
     slices = []
     ratios = b['ratios']
@@ -96,9 +118,13 @@ for b in BASE_STATIONS:
                   s['bandwidth_max'], s_cap)
         s.capacity = simpy.Container(env, init=s_cap, capacity=s_cap)
         slices.append(s)
-    b = BaseStation(i, b['x'], b['y'], Coverage((b['x'], b['y']), b['coverage'],), capacity, slices)
-    base_stations.append(b)
+    base_station = BaseStation(i, b['x'], b['y'], Coverage((b['x'], b['y']), b['coverage'],), capacity, slices)
+    base_stations.append(base_station)
+    bs_dict[(b['x'],b['y'])] = base_station
+    BS_POINTS.append(Point(b['x'],b['y']))
     i += 1
+    
+BS_POINTS = MultiPoint(BS_POINTS)
 
 ufp = CLIENTS['usage_frequency']
 usage_freq_pattern = Distributor(f'ufp', get_dist(ufp['distribution']), *ufp['params'])
@@ -118,6 +144,10 @@ for i in range(NUM_CLIENTS):
     c = Client(env, location_x, location_y,
                mobility_pattern, usage_freq_pattern.generate_scaled(), usage_pattern, connected_slice_index, base_stations[i])
     clients.append(c)
+    # shapely(c)
+
+kdtree(clients, base_stations)
+print(clients[0].base_station)
 
 #env.process(client_generator(env, NUM_CLIENTS))
 env.run(until=10)
