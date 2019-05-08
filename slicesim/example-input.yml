@@ -6,11 +6,13 @@ slices:
     qos_class: 2
     bandwidth_guaranteed: 10
     bandwidth_max: 1000
+    weight: 0.5
   data:
     delay_tolerance: 2000
     qos_class: 4
     bandwidth_guaranteed: 1000
     bandwidth_max: 50000
+    weight: 0.5
 base_stations:
   - x: 0
     y: 0
@@ -39,20 +41,33 @@ mobility_patterns:
     params:
       - 0
       - 10
+    weight: 0.5
   basic:
     distribution: randInt
     params:
       - 0
       - 5
+    weight: 0.5
 clients:
   location:
     x:
-      distribution: randomInt
+      distribution: randInt
       params:
         - -1000
         - 1000
     y:
-      distribution: randomInt
+      distribution: randInt
       params:
         - -800
         - 900
+  usage:
+    distribution: randInt
+    params:
+      - 0
+      - 1000
+  usage_frequency:
+    distribution: randInt
+    params:
+      - 0
+      - 100
+    divide_scale: 1000000

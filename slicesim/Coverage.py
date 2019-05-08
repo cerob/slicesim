@@ -10,4 +10,5 @@ class Coverage:
         return _get_gaussian_distance((x,y)) <= self.radius
 
     def __str__(self):
-        return f'[center={self.center}, r={self.radius}]'
+        x, y = self.center
+        return f'[c=({x:<4}, {y:>4}), r={self.radius:>4}]'
