@@ -12,6 +12,8 @@ from .Coverage import Coverage
 from .MobilityPattern import MobilityPattern
 from .Slice import Slice
 
+from .utils import kdtree
+
 
 def r():
     return random.randint(0, 1000)
@@ -69,8 +71,11 @@ for b in BASE_STATIONS:
 clients = []
 for i in range(NUM_CLIENTS):
     c = Client(env, random.randint(0, 1000), random.randint(0, 1000),
-                mobility_pattern, base_stations[i])
+                mobility_pattern)
     clients.append(c)
+
+kdtree(clients, base_stations)
+print(clients[0].base_station)
 
 #env.process(client_generator(env, NUM_CLIENTS))
 env.run(until=10)
