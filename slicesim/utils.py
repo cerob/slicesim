@@ -3,6 +3,8 @@ import random
 import time
 from shapely.geometry import Point, MultiPoint
 
+BS_POINTS = []
+
 origin = [(450,1003), (132,2132)]
 dest = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)]
 # origin1 = Point(origin[0], origin[1])
@@ -29,13 +31,16 @@ def kdtree(clients, base_stations):
             c.base_station = base_stations[p[0]]
 
 
-def shapely(origin, dest):
-
+def shapely(client):
     from shapely.ops import nearest_points
+    global BS_POINTS
+    print(BS_POINTS)
+    BS_POINTS = MultiPoint(BS_POINTS)
+    print(type(BS_POINTS))
 
-    destinations = MultiPoint(dest)
-
-    nearest_geoms = nearest_points(origin, destinations)
+    origin = Point(client.x, client.y)
+    print(origin)
+    nearest_geoms = nearest_points(origin, BS_POINTS)
 
     near_idx0 = nearest_geoms[0]
 
