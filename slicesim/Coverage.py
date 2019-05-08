@@ -8,3 +8,6 @@ class Coverage:
 
     def is_in_coverage(self, x, y):
         return _get_gaussian_distance((x,y)) <= self.radius
+
+    def __str__(self):
+        return f'[center={self.center}, r={self.radius}]'
