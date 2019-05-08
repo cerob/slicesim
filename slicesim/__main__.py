@@ -56,7 +56,7 @@ def get_random_mobility_pattern(vals, mobility_patterns):
 
     while vals[i] < r:
         i += 1
-    
+
     return mobility_patterns[i]
 
 
@@ -118,12 +118,12 @@ for b in BASE_STATIONS:
                   s['bandwidth_max'], s_cap)
         s.capacity = simpy.Container(env, init=s_cap, capacity=s_cap)
         slices.append(s)
-    base_station = BaseStation(i, b['x'], b['y'], Coverage((b['x'], b['y']), b['coverage'],), capacity, slices)
+    base_station = BaseStation(i, Coverage((b['x'], b['y']), b['coverage'],), capacity, slices)
     base_stations.append(base_station)
     bs_dict[(b['x'],b['y'])] = base_station
     BS_POINTS.append(Point(b['x'],b['y']))
     i += 1
-    
+
 BS_POINTS = MultiPoint(BS_POINTS)
 
 ufp = CLIENTS['usage_frequency']
@@ -135,7 +135,7 @@ for i in range(NUM_CLIENTS):
     loc_y = CLIENTS['location']['y']
     location_x = get_dist(loc_x['distribution'])(*loc_x['params'])
     location_y = get_dist(loc_y['distribution'])(*loc_y['params'])
-    
+
     mobility_pattern = get_random_mobility_pattern(mb_weights, mobility_patterns)
 
     up = CLIENTS['usage']
