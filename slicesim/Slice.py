@@ -13,6 +13,13 @@ class Slice:
         self.bandwidth_max = bandwidth_max
         self.init_capacity = init_capacity
         self.capacity = 0
+    
+    def get_consumable_share(self):
+        if self.bandwidth_guaranteed > 0:
+            # TODO handle better
+            return self.bandwidth_max / self.connected_users
+        else:
+            return self.bandwidth_max / self.connected_users
 
     def __str__(self):
         return self.name
