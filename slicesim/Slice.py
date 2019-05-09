@@ -15,11 +15,13 @@ class Slice:
         self.capacity = 0
     
     def get_consumable_share(self):
+        real_cap = min(self.init_capacity, self.bandwidth_max)
+
         if self.bandwidth_guaranteed > 0:
             # TODO handle better
-            return self.bandwidth_max / self.connected_users
+            return real_cap / self.connected_users
         else:
-            return self.bandwidth_max / self.connected_users
+            return real_cap / self.connected_users
 
     def __str__(self):
-        return self.name
+        return f'{self.name:<10} init={self.init_capacity:<5} cap={self.capacity.level:<5} diff={(self.init_capacity - self.capacity.level):<5}'

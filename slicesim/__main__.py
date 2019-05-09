@@ -112,7 +112,7 @@ for b in BASE_STATIONS:
     capacity = b['capacity_bandwidth']
     for name, s in SLICES_INFO.items():
         s_cap = capacity * ratios[name]
-        s = Slice(name, ratios[name], None, s['weight'],
+        s = Slice(name, ratios[name], 0, s['weight'],
                   s['delay_tolerance'],
                   s['qos_class'], s['bandwidth_guaranteed'],
                   s['bandwidth_max'], s_cap)
@@ -127,7 +127,7 @@ for b in BASE_STATIONS:
 BS_POINTS = MultiPoint(BS_POINTS)
 
 ufp = CLIENTS['usage_frequency']
-usage_freq_pattern = Distributor(f'ufp', get_dist(ufp['distribution']), *ufp['params'])
+usage_freq_pattern = Distributor(f'ufp', get_dist(ufp['distribution']), *ufp['params'], divide_scale=ufp['divide_scale'])
 
 clients = []
 for i in range(NUM_CLIENTS):
@@ -147,7 +147,6 @@ for i in range(NUM_CLIENTS):
     # shapely(c)
 
 kdtree(clients, base_stations)
-print(clients[0].base_station)
 
 #env.process(client_generator(env, NUM_CLIENTS))
 env.run(until=10)

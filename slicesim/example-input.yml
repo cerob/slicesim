@@ -17,21 +17,21 @@ base_stations:
   - x: 0
     y: 0
     coverage: 25
-    capacity_bandwidth: 1000
+    capacity_bandwidth: 100
     ratios:
       iot: 0.4
       data: 0.6
   - x: 15
     y: 25
     coverage: 30
-    capacity_bandwidth: 1400
+    capacity_bandwidth: 140
     ratios:
       iot: 0.2
       data: 0.8
   - x: -14
     y: -20
     coverage: 15
-    capacity_bandwidth: 700
+    capacity_bandwidth: 70
     ratios:
       iot: 0.24
       data: 0.76
@@ -69,5 +69,5 @@ clients:
     distribution: randInt
     params:
       - 0
-      - 100
+      - 100000
     divide_scale: 1000000

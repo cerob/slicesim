@@ -16,36 +16,42 @@ class Client:
         self.usage_remaining = 0
         self.last_usage = 0
         self.action = env.process(self.iter())
-        print(self)
+        print(self.usage_freq)
 
     def connect_to_closest_base_station(self):
         self.base_station = None #TODO
 
     def iter(self):
-        # print(f'[{self.env.now}] {self}')
-        slice = self.base_station.slices[self.connected_slice_index]
+        print(f'[{self.env.now}] {self}')
+        slice = self.get_slice()
 
-        # Determine usage and if there exists.
-        if self.usage_remaining <= 0:
-            if self.usage_freq < random.random():
-                # Generate a new usage
-                self.usage_remaining = self.usage_pattern.generate()
-                self.base_station.slices[self.connected_slice_index].connected_users += 1
-                print(f'[{self.env.now}] Client [{self.x}, {self.y}] requests {self.usage_remaining} usage.')
+        if self.env.now % 2 == 0:
+            # Determine usage and if there exists.
+            if self.usage_remaining <= 0:
+                if self.usage_freq < random.random():
+                    # Generate a new usage
+                    self.usage_remaining = self.usage_pattern.generate()
+                    slice.connected_users += 1
+                    print(f'[{self.env.now}] Client [{self.x}, {self.y}] requests {self.usage_remaining} usage.')
+                else:
+                    # Do nothing
+                    pass
             else:
-                # Do nothing
-                pass
+                amount = min(slice.get_consumable_share(), self.usage_remaining)
+                # Allocate resource and consume ongoing usage with given bandwidth
+                slice.capacity.get(amount)
+                print(f'[{self.env.now}] Client [{self.x}, {self.y}] gets {amount} usage.')
+                self.last_usage = amount
+                self.usage_freq -= amount
+        
         else:
-            amount = slice.get_consumable_share()
-            # Allocate resource and consume ongoing usage with given bandwidth
-            slice.capacity.get(amount)
-            self.last_usage = amount
-            
+            # Put the resource back
+            if self.last_usage != 0:
+                slice.capacity.put(self.last_usage)
+                print(f'[{self.env.now}] Client [{self.x}, {self.y}] puts back {self.last_usage} usage.')
+                self.last_usage = 0
 
         yield self.env.timeout(1)
-
-        # Put the resource back
-        slice.capacity.put(self.last_usage) if self.last_usage != 0 else pass
 
         yield self.env.process(self.iter())
 
@@ -53,4 +59,4 @@ class Client:
         return self.base_station.slices[self.connected_slice_index]
 
     def __str__(self):
-        return f'Client [{self.x:<5}, {self.y:>5}] connected to: slice={self.connected_slice_index:<2} @ {self.base_station}\t with mobility pattern of {self.mobility_pattern}'
+        return f'Client [{self.x:<5}, {self.y:>5}] connected to: slice={self.get_slice()} @ {self.base_station}\t with mobility pattern of {self.mobility_pattern}'
