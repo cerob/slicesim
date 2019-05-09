@@ -1,4 +1,4 @@
-num_clients: 3
+num_clients: 150
 num_base_stations: 3
 slices:
   iot:
@@ -16,21 +16,21 @@ slices:
 base_stations:
   - x: 0
     y: 0
-    coverage: 25
+    coverage: 1000
     capacity_bandwidth: 100
     ratios:
       iot: 0.4
       data: 0.6
-  - x: 15
-    y: 25
-    coverage: 30
+  - x: 1000
+    y: 500
+    coverage: 700
     capacity_bandwidth: 140
     ratios:
       iot: 0.2
       data: 0.8
-  - x: -14
-    y: -20
-    coverage: 15
+  - x: -500
+    y: -500
+    coverage: 500
     capacity_bandwidth: 70
     ratios:
       iot: 0.24
@@ -40,13 +40,13 @@ mobility_patterns:
     distribution: normal
     params:
       - 0
-      - 10
+      - 1
     weight: 0.5
   basic:
     distribution: randInt
     params:
       - 0
-      - 5
+      - 1
     weight: 0.5
 clients:
   location:

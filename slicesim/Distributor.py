@@ -12,8 +12,8 @@ class Distributor:
         return self.distribution(*self.dist_params) / self.divide_scale
 
     def generate_movement(self):
-        x = self.distribution(*self.dist_params)
-        y = self.distribution(*self.dist_params)
+        x = self.distribution(*self.dist_params) / self.divide_scale
+        y = self.distribution(*self.dist_params) / self.divide_scale
         return x, y
 
     def __str__(self):

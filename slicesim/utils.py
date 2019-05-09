@@ -1,17 +1,9 @@
 import math
-import random
 import time
+
 from shapely.geometry import Point, MultiPoint
+from shapely.ops import nearest_points
 
-BS_POINTS = []
-
-origin = [(450,1003), (132,2132)]
-dest = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)]
-# origin1 = Point(origin[0], origin[1])
-# dest1  = [Point(p[0], p[1]) for p in dest]
-
-origin = [(random.randint(0, 100000), random.randint(0, 100000)) for i in range(500000)]
-dest = [(random.randint(0, 100000), random.randint(0, 100000)) for i in range(50000)]
 
 def distance(a, b):
     return math.sqrt(sum((i-j)**2 for i,j in zip(a, b)))
@@ -31,7 +23,34 @@ def kdtree(clients, base_stations):
             c.base_station = base_stations[p[0]]
 
 
+class BSDict:
+    bs_dict = {}
+
+class BSMultiPoint:
+    bs_points = None
+
 def shapely(client):
+    origin = Point(client.x, client.y)
+    nearest_geoms = nearest_points(origin, BSMultiPoint.bs_points)
+    near_idx0 = nearest_geoms[0]
+
+    near_idx1 = nearest_geoms[1]
+
+
+    b = BSDict.bs_dict.get((near_idx1.x, near_idx1.y))
+    d = near_idx0.distance(near_idx1)
+
+    # print("a = ", near_idx0)
+    # print(d)
+    # print("b = ", near_idx1)
+
+    if d <= b.coverage.radius:
+        client.base_station = b
+    else:
+        client.base_station = None
+
+
+def shapely2(client):
     from shapely.ops import nearest_points
     global BS_POINTS
     print(BS_POINTS)
