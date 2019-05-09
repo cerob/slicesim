@@ -22,15 +22,15 @@ class Client:
         self.base_station = None #TODO
 
     def iter(self):
-        print(f'[{self.env.now}] {self}')
-        slice = self.base_station.slices[i]
+        # print(f'[{self.env.now}] {self}')
+        slice = self.base_station.slices[self.connected_slice_index]
 
         # Determine usage and if there exists.
         if self.usage_remaining <= 0:
             if self.usage_freq < random.random():
                 # Generate a new usage
                 self.usage_remaining = self.usage_pattern.generate()
-                self.base_station.slices[i].connected_users += 1
+                self.base_station.slices[self.connected_slice_index].connected_users += 1
                 print(f'[{self.env.now}] Client [{self.x}, {self.y}] requests {self.usage_remaining} usage.')
             else:
                 # Do nothing
@@ -45,7 +45,7 @@ class Client:
         yield self.env.timeout(1)
 
         # Put the resource back
-        slice.capacity.put(self.last_usage)
+        slice.capacity.put(self.last_usage) if self.last_usage != 0 else pass
 
         yield self.env.process(self.iter())
 
