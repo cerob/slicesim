@@ -23,5 +23,9 @@ class Slice:
         else:
             return real_cap / self.connected_users
 
+    def avaliable(self):
+        #TODO: Implement this
+        return True
+
     def __str__(self):
         return f'{self.name:<10} init={self.init_capacity:<5} cap={self.capacity.level:<5} diff={(self.init_capacity - self.capacity.level):<5}'
