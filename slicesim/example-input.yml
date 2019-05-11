@@ -1,5 +1,6 @@
 num_clients: 150
 num_base_stations: 3
+limit_closest_base_stations: 2
 slices:
   iot:
     delay_tolerance: 10

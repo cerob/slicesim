@@ -1,6 +1,6 @@
 import random
 
-from .utils import shapely
+from .utils import shapely, assign_closest_base_station
 
 
 class Client:
@@ -18,6 +18,7 @@ class Client:
         self.connected_slice_index = connected_slice_index
         self.usage_remaining = 0
         self.last_usage = 0
+        self.closest_base_stations = []
 
         # Stats
         self.total_connected_time = 0
@@ -27,7 +28,7 @@ class Client:
         self.total_usage = 0
 
         self.action = env.process(self.iter())
-        print(self.usage_freq)
+        # print(self.usage_freq)
 
     def connect_to_closest_base_station(self):
         self.base_station = None #TODO
@@ -82,7 +83,8 @@ class Client:
 
                 # Check for coverage
                 if not self.base_station.coverage.is_in_coverage(self.x, self.y):
-                    shapely(self)
+                    # shapely(self)
+                    assign_closest_base_station(self, excludes=[self.base_station.pk])
  
         yield self.env.timeout(1)
 

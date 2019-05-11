@@ -1,8 +1,10 @@
 import math
 import time
 
+import operator
 from shapely.geometry import Point, MultiPoint
 from shapely.ops import nearest_points
+from sklearn.neighbors import KDTree
 
 
 def distance(a, b):
@@ -10,7 +12,6 @@ def distance(a, b):
 
 # Initial connections using k-d tree
 def kdtree(clients, base_stations):
-    from sklearn.neighbors import KDTree
 
     c_coor = [(c.x,c.y) for c in clients]
     bs_coor = [p.coverage.center for p in base_stations]
@@ -22,6 +23,35 @@ def kdtree(clients, base_stations):
         if d[0] <= base_stations[p[0]].coverage.radius:
             c.base_station = base_stations[p[0]]
 
+# Initial connections using k-d tree
+def kdtree_all(clients, base_stations, LIMIT_CLOSEST_POINT=1):
+
+    c_coor = [(c.x,c.y) for c in clients]
+    bs_coor = [p.coverage.center for p in base_stations]
+
+    tree = KDTree(bs_coor, leaf_size=2)
+    res = tree.query(c_coor,k=min(LIMIT_CLOSEST_POINT,len(base_stations)))
+
+    # print(res[0])
+    for c, d, p in zip(clients, res[0], res[1]):
+        if d[0] <= base_stations[p[0]].coverage.radius:
+            c.base_station = base_stations[p[0]]    
+        c.closest_base_stations = [(a, base_stations[b]) for a,b in zip(d,p)]
+
+# Check closest base_stations of a client and assign the closest non-excluded avaliable base_station to the client.
+def assign_closest_base_station(client, excludes=None):
+    updated_list = []
+    for d,b in client.closest_base_stations:
+        if b.pk in excludes:
+            continue
+        d = distance((client.x, client.y), (b.coverage.x, b.coverage.y))
+        updated_list.append((d,b))
+    updated_list.sort(key = operator.itemgetter(0))
+    for d,b in updated_list:
+        if d <= b.coverage.radius:
+            client.base_station = b
+            return
+    client.base_station = None
 
 class BSDict:
     bs_dict = {}
