@@ -122,7 +122,7 @@ for i in range(NUM_CLIENTS):
 
 kdtree(clients, base_stations)
 
-stats = Stats(env, base_stations)
+stats = Stats(env, base_stations, clients)
 env.process(stats.collect())
 
 env.run(until=10)

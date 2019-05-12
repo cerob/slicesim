@@ -1,7 +1,8 @@
 class Stats:
-    def __init__(self, env, base_stations):
+    def __init__(self, env, base_stations, clients):
         self.env = env
         self.base_stations = base_stations
+        self.clients = clients
 
         # Stats
         self.total_connected_users = []
@@ -28,9 +29,11 @@ class Stats:
 
     def get_total_connected_users(self):
         t = 0
-        for bs in self.base_stations:
-            for sl in bs.slices:
-                t += sl.connected_users
+        for c in self.clients:
+            t += c.connected
+        # for bs in self.base_stations:
+        #     for sl in bs.slices:
+        #         t += sl.connected_users
         return t
 
     def get_total_used_bw(self):

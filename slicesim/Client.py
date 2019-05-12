@@ -7,7 +7,7 @@ from .utils import shapely, distance
 class Client:
     def __init__(self, pk, env, x, y, mobility_pattern,
                  usage_freq, usage_pattern,
-                 connected_slice_index, base_station=None):
+                 subscribed_slice_index, base_station=None):
         self.pk = pk
         self.env = env
         self.x = x
@@ -16,7 +16,7 @@ class Client:
         self.usage_freq = usage_freq
         self.usage_pattern = usage_pattern
         self.base_station = base_station
-        self.connected_slice_index = connected_slice_index
+        self.subscribed_slice_index = subscribed_slice_index
         self.usage_remaining = 0
         self.last_usage = 0
         self.closest_base_stations = []
@@ -31,9 +31,6 @@ class Client:
 
         self.action = env.process(self.iter())
         # print(self.usage_freq)
-
-    def connect_to_closest_base_station(self):
-        self.base_station = None #TODO
 
     def iter(self):
         print(f'[{int((self.env.now+1)/2)}] {self}')
@@ -89,7 +86,7 @@ class Client:
     def get_slice(self):
         if self.base_station is None:
             return None
-        return self.base_station.slices[self.connected_slice_index]
+        return self.base_station.slices[self.subscribed_slice_index]
     
     def connect(self):
         slice = self.get_slice()
