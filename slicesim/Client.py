@@ -1,6 +1,7 @@
+import operator
 import random
 
-from .utils import shapely, assign_closest_base_station
+from .utils import shapely, distance
 
 
 class Client:
@@ -79,7 +80,7 @@ class Client:
                 if not self.base_station.coverage.is_in_coverage(self.x, self.y):
                     self.disconnect()
                     # shapely(self)
-                    assign_closest_base_station(self, excludes=[self.base_station.pk])
+                    self.assign_closest_base_station(excludes=[self.base_station.pk])
  
         yield self.env.timeout(1)
 
@@ -92,7 +93,7 @@ class Client:
     
     def connect(self):
         slice = self.get_slice()
-        if slice.avaliable():
+        if slice.is_avaliable() and self.connected == False:
             slice.connected_users += 1
             self.connected = True
             print(f'[{int(self.env.now/2)}] Client_{self.pk} [{self.x}, {self.y}] connected to slice={self.get_slice()} @ {self.base_station}')
@@ -102,10 +103,13 @@ class Client:
             return False
 
     def disconnect(self):
-        slice = self.get_slice()
-        slice.connected_users -= 1
-        self.connected = False
-        print(f'[{int(self.env.now/2)}] Client_{self.pk} [{self.x}, {self.y}] disconnected from slice={self.get_slice()} @ {self.base_station}')
+        if self.connected == False:
+            print(f'[{int(self.env.now/2)}] Client_{self.pk} [{self.x}, {self.y}] is already disconnected from slice={self.get_slice()} @ {self.base_station}')
+        else:
+            slice = self.get_slice()
+            slice.connected_users -= 1
+            self.connected = False
+            print(f'[{int(self.env.now/2)}] Client_{self.pk} [{self.x}, {self.y}] disconnected from slice={self.get_slice()} @ {self.base_station}')
         return not self.connected
 
     def consume_start(self):
@@ -126,6 +130,21 @@ class Client:
             self.total_consume_time += 1
             self.total_usage += self.last_usage
             self.last_usage = 0
+
+    # Check closest base_stations of a client and assign the closest non-excluded avaliable base_station to the client.
+    def assign_closest_base_station(self, excludes=None):
+        updated_list = []
+        for d,b in self.closest_base_stations:
+            if b.pk in excludes:
+                continue
+            d = distance((self.x, self.y), (b.coverage.x, b.coverage.y))
+            updated_list.append((d,b))
+        updated_list.sort(key = operator.itemgetter(0))
+        for d,b in updated_list:
+            if d <= b.coverage.radius:
+                self.base_station = b
+                return
+        self.base_station = None
 
     def __str__(self):
         return f'Client_{self.pk} [{self.x:<5}, {self.y:>5}] connected to: slice={self.get_slice()} @ {self.base_station}\t with mobility pattern of {self.mobility_pattern}'

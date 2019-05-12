@@ -23,8 +23,11 @@ class Slice:
         else:
             return real_cap / self.connected_users
 
-    def avaliable(self):
-        #TODO: Implement this
+    def is_avaliable(self):
+        real_cap = min(self.init_capacity, self.bandwidth_max)
+        bandwidth_next = real_cap / (self.connected_users + 1)
+        if bandwidth_next < self.bandwidth_guaranteed:
+            return False
         return True
 
     def __str__(self):
