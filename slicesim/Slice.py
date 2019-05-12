@@ -17,9 +17,8 @@ class Slice:
     def get_consumable_share(self):
         real_cap = min(self.init_capacity, self.bandwidth_max)
 
-        if self.bandwidth_guaranteed > 0:
-            # TODO handle better
-            return real_cap / self.connected_users
+        if self.connected_users <= 0:
+            return real_cap
         else:
             return real_cap / self.connected_users
 
