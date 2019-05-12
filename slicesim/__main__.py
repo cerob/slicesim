@@ -12,15 +12,13 @@ from .BaseStation import BaseStation
 from .Client import Client
 from .Coverage import Coverage
 from .Distributor import Distributor
+from .Graph import Graph
 from .Slice import Slice
+from .Stats import Stats
 
 from .utils import BSDict, BSMultiPoint, distance, kdtree
 
 BS_POINTS = []
-
-def r():
-    return random.randint(0, 1000)
-
 
 def get_dist(d):
     #TODO expand list
@@ -48,10 +46,6 @@ def get_random_slice_index(vals):
     while vals[i] < r:
         i += 1
     return i
-
-
-def run(env):
-    pass
 
 
 # Read YAML file
@@ -84,11 +78,6 @@ for name, mb in MOBILITY_PATTERNS.items():
     mobility_pattern = Distributor(name, get_dist(mb['distribution']), *mb['params'])
     mobility_patterns.append(mobility_pattern)
 
-fig, ax = plt.subplots()
-ax.set_xlim((-1500, 1500))
-ax.set_ylim((-1500, 1500))
-ax.set_aspect('equal')
-colors = ['c', 'm', 'y']
 base_stations = []
 i = 0
 for b in BASE_STATIONS:
@@ -103,16 +92,12 @@ for b in BASE_STATIONS:
                   s['bandwidth_max'], s_cap)
         s.capacity = simpy.Container(env, init=s_cap, capacity=s_cap)
         slices.append(s)
-    base_station = BaseStation(i, Coverage((b['x'], b['y']), b['coverage'],), capacity, slices)
+    base_station = BaseStation(i, Coverage((b['x'], b['y']), b['coverage']), capacity, slices)
     base_stations.append(base_station)
     BSDict.bs_dict[(b['x'], b['y'])] = base_station
     BS_POINTS.append(Point(b['x'], b['y']))
     i += 1
 
-    circle = plt.Circle((b['x'], b['y']), b['coverage'], color=colors[int(i%len(colors))])
-    ax.add_artist(circle)
-
-#BS_POINTS = MultiPoint(BS_POINTS)
 BSMultiPoint.bs_points = MultiPoint(BS_POINTS)
 
 ufp = CLIENTS['usage_frequency']
@@ -136,10 +121,10 @@ for i in range(NUM_CLIENTS):
     # shapely(c)
 
 kdtree(clients, base_stations)
-plt.plot([c.x for c in clients], [c.y for c in clients], '.', color='k')
-fig.savefig('base_stations.png', dpi=1000)
 
-#env.process(client_generator(env, NUM_CLIENTS))
+stats = Stats(env, base_stations)
+env.process(stats.collect())
+
 env.run(until=10)
 
 for client in clients:
@@ -150,3 +135,10 @@ for client in clients:
     print(f'\tTotal consume time: {client.total_consume_time:>5}')
     print(f'\tTotal usage: {client.total_usage:>5}')
     print()
+
+print(stats.get_stats())
+
+graph = Graph(base_stations, clients)
+graph.draw_all(*stats.get_stats())
+graph.save_fig()
+graph.show_plot()
