@@ -1,7 +1,6 @@
 import math
 import time
 
-import operator
 from shapely.geometry import Point, MultiPoint
 from shapely.ops import nearest_points
 from sklearn.neighbors import KDTree
@@ -37,21 +36,6 @@ def kdtree_all(clients, base_stations, LIMIT_CLOSEST_POINT=1):
         if d[0] <= base_stations[p[0]].coverage.radius:
             c.base_station = base_stations[p[0]]    
         c.closest_base_stations = [(a, base_stations[b]) for a,b in zip(d,p)]
-
-# Check closest base_stations of a client and assign the closest non-excluded avaliable base_station to the client.
-def assign_closest_base_station(client, excludes=None):
-    updated_list = []
-    for d,b in client.closest_base_stations:
-        if b.pk in excludes:
-            continue
-        d = distance((client.x, client.y), (b.coverage.x, b.coverage.y))
-        updated_list.append((d,b))
-    updated_list.sort(key = operator.itemgetter(0))
-    for d,b in updated_list:
-        if d <= b.coverage.radius:
-            client.base_station = b
-            return
-    client.base_station = None
 
 class BSDict:
     bs_dict = {}
