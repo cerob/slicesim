@@ -1,6 +1,6 @@
 num_clients: 1000
-num_base_stations: 3
-limit_closest_base_stations: 3
+num_base_stations: 5
+limit_closest_base_stations: 5
 slices:
   iot:
     delay_tolerance: 10
@@ -18,24 +18,38 @@ base_stations:
   - x: 0
     y: 0
     coverage: 600
-    capacity_bandwidth: 100000
+    capacity_bandwidth: 1000000
     ratios:
       iot: 0.4
       data: 0.6
   - x: 1000
     y: 500
     coverage: 700
-    capacity_bandwidth: 140000
+    capacity_bandwidth: 1400000
     ratios:
       iot: 0.2
       data: 0.8
   - x: -500
     y: -500
     coverage: 500
-    capacity_bandwidth: 7000
+    capacity_bandwidth: 700000
     ratios:
       iot: 0.24
       data: 0.76
+  - x: -750
+    y: 850
+    coverage: 800
+    capacity_bandwidth: 1200000
+    ratios:
+      iot: 0.10
+      data: 0.90
+  - x: 450
+    y: -950
+    coverage: 900
+    capacity_bandwidth: 1000000
+    ratios:
+      iot: 0.20
+      data: 0.80
 mobility_patterns:
   normal_btw_0_1000:
     distribution: normal
@@ -65,7 +79,7 @@ clients:
     distribution: randInt
     params:
       - 0
-      - 1000
+      - 100000
   usage_frequency:
     distribution: randInt
     params:

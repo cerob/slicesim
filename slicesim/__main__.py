@@ -123,10 +123,12 @@ for i in range(NUM_CLIENTS):
 
 kdtree(clients, base_stations)
 
+graph = Graph(base_stations, clients)
+#graph.show_plot()
 stats = Stats(env, base_stations, clients)
 env.process(stats.collect())
 
-env.run(until=10)
+env.run(until=100)
 
 for client in clients:
     print(client)
@@ -139,7 +141,7 @@ for client in clients:
 
 print(stats.get_stats())
 
-graph = Graph(base_stations, clients)
+#graph.draw_live()
 graph.draw_all(*stats.get_stats())
 graph.save_fig()
 graph.show_plot()

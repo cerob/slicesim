@@ -1,3 +1,4 @@
+import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import randomcolor
@@ -20,6 +21,9 @@ class Graph:
             bs.color = c
         # TODO prevent similar colors
 
+    def draw_live(self, *stats):
+        ani = animation.FuncAnimation(self.fig, self.draw_all, fargs=stats, interval=1000)
+        plt.show()
 
     def draw_all(self, *stats):
         plt.clf()
