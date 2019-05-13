@@ -1,38 +1,38 @@
-num_clients: 150
+num_clients: 1000
 num_base_stations: 3
-limit_closest_base_stations: 2
+limit_closest_base_stations: 3
 slices:
   iot:
     delay_tolerance: 10
     qos_class: 2
     bandwidth_guaranteed: 10
-    bandwidth_max: 1000
+    bandwidth_max: 10000000
     weight: 0.5
   data:
     delay_tolerance: 2000
     qos_class: 4
     bandwidth_guaranteed: 1000
-    bandwidth_max: 50000
+    bandwidth_max: 50000000
     weight: 0.5
 base_stations:
   - x: 0
     y: 0
-    coverage: 1000
-    capacity_bandwidth: 100
+    coverage: 600
+    capacity_bandwidth: 100000
     ratios:
       iot: 0.4
       data: 0.6
   - x: 1000
     y: 500
     coverage: 700
-    capacity_bandwidth: 140
+    capacity_bandwidth: 140000
     ratios:
       iot: 0.2
       data: 0.8
   - x: -500
     y: -500
     coverage: 500
-    capacity_bandwidth: 70
+    capacity_bandwidth: 7000
     ratios:
       iot: 0.24
       data: 0.76

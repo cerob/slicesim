@@ -86,6 +86,7 @@ for b in BASE_STATIONS:
     capacity = b['capacity_bandwidth']
     for name, s in SLICES_INFO.items():
         s_cap = capacity * ratios[name]
+        # TODO remove bandwidth max
         s = Slice(name, ratios[name], 0, s['weight'],
                   s['delay_tolerance'],
                   s['qos_class'], s['bandwidth_guaranteed'],

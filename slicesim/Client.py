@@ -33,9 +33,10 @@ class Client:
         # print(self.usage_freq)
 
     def iter(self):
-        print(f'[{int((self.env.now+1)/2)}] {self}')
+        #print(f'[{int((self.env.now+1)/2)}] {self}')
         
         if self.base_station is None:
+            # TODO
             # Client is not connected to a base station
             self.total_unconnected_time += 0.5
 
@@ -43,7 +44,7 @@ class Client:
             # Client is connected to a base station
             self.total_connected_time += 0.5
 
-            if self.env.now % 2 == 0:            
+            if self.env.now % 2 == 0:
                 # Determine usage and if there exists.
                 if self.usage_remaining <= 0:
                     if self.usage_freq < random.random():
@@ -68,17 +69,20 @@ class Client:
                 if self.usage_remaining <= 0:
                     self.disconnect()
 
-                # Move the client
-                x, y = self.mobility_pattern.generate_movement()
-                self.x += x
-                self.y += y
+        if self.env.now % 2 == 1:
+            # Move the client
+            x, y = self.mobility_pattern.generate_movement()
+            self.x += x
+            self.y += y
 
-                # Check for coverage
-                if not self.base_station.coverage.is_in_coverage(self.x, self.y):
-                    self.disconnect()
-                    # shapely(self)
-                    self.assign_closest_base_station(excludes=[self.base_station.pk])
- 
+            # Check for coverage
+            if self.base_station is None:
+                self.assign_closest_base_station()
+            elif not self.base_station.coverage.is_in_coverage(self.x, self.y):
+                self.disconnect()
+                # shapely(self)
+                self.assign_closest_base_station(excludes=[self.base_station.pk])
+
         yield self.env.timeout(1)
 
         yield self.env.process(self.iter())
@@ -89,13 +93,17 @@ class Client:
         return self.base_station.slices[self.subscribed_slice_index]
     
     def connect(self):
+        # TODO handover
         slice = self.get_slice()
-        if slice.is_avaliable() and self.connected == False:
+        if self.connected:
+            return
+        if slice.is_avaliable():
             slice.connected_users += 1
             self.connected = True
             print(f'[{int(self.env.now/2)}] Client_{self.pk} [{self.x}, {self.y}] connected to slice={self.get_slice()} @ {self.base_station}')
             return True
         else:
+            # TODO log block
             print(f'[{int(self.env.now/2)}] Client_{self.pk} [{self.x}, {self.y}] connection refused to slice={self.get_slice()} @ {self.base_station}')
             return False
 

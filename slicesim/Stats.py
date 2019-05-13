@@ -75,5 +75,5 @@ class Stats:
 
 # TODO
 # block count
-# drop count
+# handover event
 # average mobility
