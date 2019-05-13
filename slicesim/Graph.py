@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
+import randomcolor
+# import numpy as np
 
 
 class Graph:
@@ -11,6 +13,14 @@ class Graph:
 
         self.gs = gridspec.GridSpec(4, 3, width_ratios=[3, 1, 1])
 
+        rand_color = randomcolor.RandomColor()
+        colors = rand_color.generate(luminosity='bright', count=len(base_stations))
+        # colors = [np.random.randint(256*0.2, 256*0.7+1, size=(3,))/256 for __ in range(len(self.base_stations))]
+        for c, bs in zip(colors, self.base_stations):
+            bs.color = c
+        # TODO prevent similar colors
+
+
     def draw_all(self, *stats):
         plt.clf()
         self.draw_map()
@@ -21,21 +31,22 @@ class Graph:
         ax.set_xlim((-1000, 1000))
         ax.set_ylim((-1000, 1000))
         ax.set_aspect('equal')
-
-        colors = ['c', 'm', 'y']
         
         # base stations
-        for i, bs in zip(range(len(self.base_stations)), self.base_stations):
+        for bs in self.base_stations:
             circle = plt.Circle(bs.coverage.center, bs.coverage.radius,
                                 fill=False, linewidth=5, alpha=0.9,
-                                color=colors[int(i%len(colors))])
+                                color=bs.color)
             ax.add_artist(circle)
         
         # clients
-        ax.plot([c.x for c in self.clients],
-                     [c.y for c in self.clients], '.', color='k')
+        for c in self.clients:
+            ax.scatter(c.x, c.y, color=c.base_station.color if c.base_station is not None else '0.8')
+        # ax.plot([c.x for c in self.clients],
+        #         [c.y for c in self.clients], '.',
+        #         color=c.base_station.color if c.base_station is not None else 'b')
 
-    def draw_stats(self, vals, vals1, vals2, vals3):
+    def draw_stats(self, vals, vals1, vals2, vals3, vals4):
         ax1 = plt.subplot(self.gs[0, 1])
         ax1.plot(vals, marker='.')
         ax1.set_yticks(range(min(vals), max(vals)+1))
@@ -61,6 +72,13 @@ class Graph:
         ax4.set_xlim(left=0)
         ax4.use_sticky_edges = False
         ax4.set_title('Average Slice Client Count Ratio')
+
+        ax5 = plt.subplot(self.gs[0, 2])
+        ax5.plot(vals4, marker='.')
+        ax5.set_xlim(left=0)
+        ax5.set_ylim(0, 1)
+        ax5.use_sticky_edges = False
+        ax5.set_title('Coverage Ratio')
 
         plt.tight_layout()
 

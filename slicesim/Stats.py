@@ -9,6 +9,7 @@ class Stats:
         self.total_used_bw = []
         self.avg_slice_load_ratio = []
         self.avg_slice_client_count = []
+        self.coverage_ratio = []
     
     def get_stats(self):
         return (
@@ -16,6 +17,7 @@ class Stats:
             self.total_used_bw,
             self.avg_slice_load_ratio,
             self.avg_slice_client_count,
+            self.coverage_ratio,
         )
 
     def collect(self):
@@ -25,6 +27,7 @@ class Stats:
             self.total_used_bw.append(self.get_total_used_bw())
             self.avg_slice_load_ratio.append(self.get_avg_slice_load_ratio())
             self.avg_slice_client_count.append(self.get_avg_slice_client_count())
+            self.coverage_ratio.append(self.get_coverage_ratio())
             yield self.env.timeout(2)
 
     def get_total_connected_users(self):
@@ -58,9 +61,19 @@ class Stats:
                 c += 1
                 t += sl.connected_users
         return t/c if c !=0 else None
+    
+    def get_coverage_ratio(self):
+        t, cc = 0, 0
+        for c in self.clients:
+            cc += 1
+            if c.base_station is not None and c.base_station.coverage.is_in_coverage(c.x, c.y):
+                t += 1
+        return t/cc if cc !=0 else None
+
+
 
 
 # TODO
-# in coverage ratio
 # block count
 # drop count
+# average mobility
