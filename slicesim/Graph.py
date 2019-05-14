@@ -5,13 +5,14 @@ import randomcolor
 
 
 class Graph:
-    def __init__(self, base_stations, clients):
+    def __init__(self, base_stations, clients, xlim):
         self.base_stations = base_stations
         self.clients = clients
+        self.xlim = xlim
         self.fig = plt.figure(figsize=(16,9))
         self.fig.canvas.set_window_title('Network Slicing Simulation')
 
-        self.gs = gridspec.GridSpec(4, 3, width_ratios=[3, 1, 1])
+        self.gs = gridspec.GridSpec(4, 3, width_ratios=[6, 3, 3])
 
         rand_color = randomcolor.RandomColor()
         colors = rand_color.generate(luminosity='bright', count=len(base_stations))
@@ -46,9 +47,8 @@ class Graph:
         # clients
         legend_indexed = []
         for c in self.clients:
-            # TODO set marker according to size
             label = None
-            if c.subscribed_slice_index not in legend_indexed:
+            if c.subscribed_slice_index not in legend_indexed and c.base_station is not None:
                 label = c.get_slice().name
                 legend_indexed.append(c.subscribed_slice_index)
             self.ax.scatter(c.x, c.y,
@@ -63,34 +63,39 @@ class Graph:
     def draw_stats(self, vals, vals1, vals2, vals3, vals4):
         self.ax1 = plt.subplot(self.gs[0, 1])
         self.ax1.plot(vals)
-        self.ax1.set_yticks(range(min(vals), max(vals)+1))
-        self.ax1.set_xlim(left=0)
+        self.ax1.set_xlim(self.xlim)
+        locs = self.ax1.get_xticks()
+        locs[0] = self.xlim[0]
+        locs[-1] = self.xlim[1]
+        self.ax1.set_xticks(locs)
         self.ax1.use_sticky_edges = False
         self.ax1.set_title(f'Total Connected Clients (out of {len(self.clients)} clients)')
 
         self.ax2 = plt.subplot(self.gs[1, 1])
         self.ax2.plot(vals1)
-        self.ax2.set_xlim(left=0)
+        self.ax2.set_xlim(self.xlim)
+        self.ax2.set_xticks(locs)
         self.ax2.use_sticky_edges = False
         self.ax2.set_title('Total Bandwidth Usage')
 
         self.ax3 = plt.subplot(self.gs[2, 1])
         self.ax3.plot(vals2)
-        self.ax3.set_xlim(left=0)
-        #self.ax3.set_ylim(0, 1)
+        self.ax3.set_xlim(self.xlim)
+        self.ax3.set_xticks(locs)
         self.ax3.use_sticky_edges = False
         self.ax3.set_title('Average Slice Bandwidth Load Ratio')
 
         self.ax4 = plt.subplot(self.gs[3, 1])
         self.ax4.plot(vals3)
-        self.ax4.set_xlim(left=0)
+        self.ax4.set_xlim(self.xlim)
+        self.ax4.set_xticks(locs)
         self.ax4.use_sticky_edges = False
         self.ax4.set_title('Average Slice Client Count Ratio')
 
         self.ax5 = plt.subplot(self.gs[0, 2])
         self.ax5.plot(vals4)
-        self.ax5.set_xlim(left=0)
-        #self.ax5.set_ylim(0, 1)
+        self.ax5.set_xlim(self.xlim)
+        self.ax5.set_xticks(locs)
         self.ax5.use_sticky_edges = False
         self.ax5.set_title('Coverage Ratio')
 
