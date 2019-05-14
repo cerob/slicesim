@@ -20,7 +20,7 @@ from .utils import KDTree
 def get_dist(d):
     return {
         'randrange': random.randrange, # start, stop, step
-        'randInt': random.randint, # a, b
+        'randint': random.randint, # a, b
         'random': random.random,
         'uniform': random, # a, b
         'triangular': random.triangular, # low, high, mode

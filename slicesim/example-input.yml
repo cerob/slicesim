@@ -1,12 +1,12 @@
 settings:
-  simulation_time: 10
-  num_clients: 100
-  limit_closest_base_stations: 5
+  simulation_time: 100
+  num_clients: 10000
+  limit_closest_base_stations: 7
   statistics_params:
     warmup_ratio: 0.05
     cooldown_ratio: 0.05
   logging: False
-  plotting: False
+  plotting: True
 slices:
   iot:
     delay_tolerance: 10
@@ -80,9 +80,9 @@ mobility_patterns:
       - 1
     weight: 0.5
   basic:
-    distribution: randInt
+    distribution: randint
     params:
-      - 0
+      - -1
       - 1
     weight: 0.5
 clients:
@@ -98,12 +98,12 @@ clients:
         - 0
         - 600
   usage:
-    distribution: randInt
+    distribution: randint
     params:
       - 0
       - 100000
   usage_frequency:
-    distribution: randInt
+    distribution: randint
     params:
       - 0
       - 100000
