@@ -1,6 +1,12 @@
-num_clients: 1000
-num_base_stations: 5
-limit_closest_base_stations: 5
+settings:
+  simulation_time: 10
+  num_clients: 100
+  limit_closest_base_stations: 5
+  statistics_params:
+    warmup_ratio: 0.05
+    cooldown_ratio: 0.05
+  logging: False
+  plotting: False
 slices:
   iot:
     delay_tolerance: 10
@@ -8,12 +14,14 @@ slices:
     bandwidth_guaranteed: 10
     bandwidth_max: 10000000
     weight: 0.5
+    threshold: 0.8
   data:
     delay_tolerance: 2000
     qos_class: 4
     bandwidth_guaranteed: 1000
     bandwidth_max: 50000000
     weight: 0.5
+    threshold: 0.87
 base_stations:
   - x: 0
     y: 0
@@ -50,6 +58,20 @@ base_stations:
     ratios:
       iot: 0.20
       data: 0.80
+  - x: -1300
+    y: -1300
+    coverage: 400
+    capacity_bandwidth: 120000
+    ratios:
+      iot: 0.01
+      data: 0.99
+  - x: 1100
+    y: 1300
+    coverage: 357
+    capacity_bandwidth: 100000
+    ratios:
+      iot: 0.50
+      data: 0.50
 mobility_patterns:
   normal_btw_0_1000:
     distribution: normal
@@ -66,15 +88,15 @@ mobility_patterns:
 clients:
   location:
     x:
-      distribution: randInt
+      distribution: normal
       params:
-        - -1000
-        - 1000
+        - 0
+        - 600
     y:
-      distribution: randInt
+      distribution: normal
       params:
-        - -800
-        - 900
+        - 0
+        - 600
   usage:
     distribution: randInt
     params:
