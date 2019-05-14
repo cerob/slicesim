@@ -5,7 +5,6 @@ import random
 
 import matplotlib.pyplot as plt
 import numpy as np
-from shapely.geometry import Point, MultiPoint
 import simpy
 import yaml
 
@@ -127,7 +126,6 @@ for i in range(NUM_CLIENTS):
     c = Client(i, env, location_x, location_y,
                mobility_pattern, usage_freq_pattern.generate_scaled(), usage_pattern, connected_slice_index, None)
     clients.append(c)
-    # shapely(c)
 
 kdtree_all(clients, base_stations, LIMIT_CLOSEST_POINT=SETTINGS['limit_closest_base_stations'])
 
