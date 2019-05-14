@@ -19,12 +19,22 @@ from .Stats import Stats
 from .utils import kdtree_all
 
 def get_dist(d):
-    #TODO expand list
-    dists = {
-        'normal': np.random.normal,
-        'randInt': random.randint,
-    }
-    return dists[d]
+    return {
+        'randrange': random.randrange, # start, stop, step
+        'randInt': random.randint, # a, b
+        'random': random.random,
+        'uniform': random, # a, b
+        'triangular': random.triangular, # low, high, mode
+        'beta': random.betavariate, # alpha, beta
+        'expo': random.expovariate, # lambda
+        'gamma': random.gammavariate, # alpha, beta
+        'gauss': random.gauss, # mu, sigma
+        'lognorm': random.lognormvariate, # mu, sigma
+        'normal': random.normalvariate, # mu, sigma
+        'vonmises': random.vonmisesvariate, # mu, kappa
+        'pareto': random.paretovariate, # alpha
+        'weibull': random.weibullvariate # alpha, beta
+    }.get(d)
 
 
 def get_random_mobility_pattern(vals, mobility_patterns):
