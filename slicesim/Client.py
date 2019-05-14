@@ -1,7 +1,7 @@
 import operator
 import random
 
-from .utils import shapely, distance
+from .utils import distance
 
 
 class Client:
@@ -148,14 +148,16 @@ class Client:
     def assign_closest_base_station(self, exclude=None):
         updated_list = []
         for d,b in self.closest_base_stations:
-            if b.pk in exclude:
-                continue
-            d = distance((self.x, self.y), (b.coverage.x, b.coverage.y))
+            if exclude is not None:
+                if b.pk in exclude:
+                    continue
+            d = distance((self.x, self.y), (b.coverage.center[0], b.coverage.center[1]))
             updated_list.append((d,b))
         updated_list.sort(key=operator.itemgetter(0))
         for d,b in updated_list:
             if d <= b.coverage.radius:
                 self.base_station = b
+                print(f'[{int(self.env.now)}]Client_{self.pk} freshly assigned to {self.base_station}')
                 return
         self.base_station = None
 

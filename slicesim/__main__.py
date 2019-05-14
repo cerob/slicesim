@@ -1,5 +1,6 @@
 import math
 import os
+import sys
 import random
 
 import matplotlib.pyplot as plt
@@ -16,9 +17,7 @@ from .Graph import Graph
 from .Slice import Slice
 from .Stats import Stats
 
-from .utils import BSDict, BSMultiPoint, distance, kdtree
-
-BS_POINTS = []
+from .utils import kdtree_all
 
 def get_dist(d):
     #TODO expand list
@@ -49,19 +48,24 @@ def get_random_slice_index(vals):
 
 
 # Read YAML file
-CONF_FILENAME = os.path.join(os.path.dirname(__file__), 'example-input.yml')
+CONF_FILENAME = os.path.join(os.path.dirname(__file__), sys.argv[1])
 with open(CONF_FILENAME, 'r') as stream:
     data = yaml.load(stream, Loader=yaml.FullLoader)
 
 random.seed()
 env = simpy.Environment()
 
+SETTINGS = data['settings']
 SLICES_INFO = data['slices']
-NUM_CLIENTS = data['num_clients'] # 3
-NUM_BASE_STATIONS = data['num_base_stations'] # 3
+NUM_CLIENTS = SETTINGS['num_clients'] # 3
 MOBILITY_PATTERNS = data['mobility_patterns']
 BASE_STATIONS = data['base_stations']
 CLIENTS = data['clients']
+
+if SETTINGS['logging']:
+    sys.stdout = open(sys.argv[2],'wt')
+else:
+    sys.stdout = open(os.devnull, 'w')
 
 collected, slice_weights = 0, []
 for __, s in SLICES_INFO.items():
@@ -95,11 +99,7 @@ for b in BASE_STATIONS:
         slices.append(s)
     base_station = BaseStation(i, Coverage((b['x'], b['y']), b['coverage']), capacity, slices)
     base_stations.append(base_station)
-    BSDict.bs_dict[(b['x'], b['y'])] = base_station
-    BS_POINTS.append(Point(b['x'], b['y']))
     i += 1
-
-BSMultiPoint.bs_points = MultiPoint(BS_POINTS)
 
 ufp = CLIENTS['usage_frequency']
 usage_freq_pattern = Distributor(f'ufp', get_dist(ufp['distribution']), *ufp['params'], divide_scale=ufp['divide_scale'])
@@ -121,14 +121,12 @@ for i in range(NUM_CLIENTS):
     clients.append(c)
     # shapely(c)
 
-kdtree(clients, base_stations)
+kdtree_all(clients, base_stations, LIMIT_CLOSEST_POINT=SETTINGS['limit_closest_base_stations'])
 
-graph = Graph(base_stations, clients)
-#graph.show_plot()
 stats = Stats(env, base_stations, clients)
 env.process(stats.collect())
 
-env.run(until=100)
+env.run(until=int(SETTINGS['simulation_time']))
 
 for client in clients:
     print(client)
@@ -141,7 +139,11 @@ for client in clients:
 
 print(stats.get_stats())
 
-#graph.draw_live()
-graph.draw_all(*stats.get_stats())
-graph.save_fig()
-graph.show_plot()
+if SETTINGS['plotting']:
+    graph = Graph(base_stations, clients)
+    graph.draw_all(*stats.get_stats())
+    graph.save_fig()
+    graph.show_plot()
+
+sys.stdout = sys.__stdout__
+print('Simulation ran successfully and output file created as:',sys.argv[2])
