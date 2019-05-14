@@ -16,7 +16,7 @@ from .Graph import Graph
 from .Slice import Slice
 from .Stats import Stats
 
-from .utils import kdtree_all
+from .utils import KDTree
 
 def get_dist(d):
     return {
@@ -121,6 +121,8 @@ for b in BASE_STATIONS:
 ufp = CLIENTS['usage_frequency']
 usage_freq_pattern = Distributor(f'ufp', get_dist(ufp['distribution']), *ufp['params'], divide_scale=ufp['divide_scale'])
 
+stats = Stats(env, base_stations, None)
+
 clients = []
 for i in range(NUM_CLIENTS):
     loc_x = CLIENTS['location']['x']
@@ -134,12 +136,13 @@ for i in range(NUM_CLIENTS):
     usage_pattern = Distributor(f'C_{i}_up', get_dist(up['distribution']), *up['params'])
     connected_slice_index = get_random_slice_index(slice_weights)
     c = Client(i, env, location_x, location_y,
-               mobility_pattern, usage_freq_pattern.generate_scaled(), usage_pattern, connected_slice_index, None)
+               mobility_pattern, usage_freq_pattern.generate_scaled(), usage_pattern, connected_slice_index, stats)
     clients.append(c)
 
-kdtree_all(clients, base_stations, LIMIT_CLOSEST_POINT=SETTINGS['limit_closest_base_stations'])
+KDTree.limit = SETTINGS['limit_closest_base_stations']
+KDTree.run(clients, base_stations, 0)
 
-stats = Stats(env, base_stations, clients)
+stats.clients = clients
 env.process(stats.collect())
 
 env.run(until=int(SETTINGS['simulation_time']))

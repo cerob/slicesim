@@ -1,13 +1,14 @@
 import operator
 import random
 
-from .utils import distance
+from .utils import distance, KDTree
 
 
 class Client:
     def __init__(self, pk, env, x, y, mobility_pattern,
                  usage_freq, usage_pattern,
-                 subscribed_slice_index, base_station=None):
+                 subscribed_slice_index, stat_collector,
+                 base_station=None):
         self.pk = pk
         self.env = env
         self.x = x
@@ -16,6 +17,7 @@ class Client:
         self.usage_freq = usage_freq
         self.usage_pattern = usage_pattern
         self.base_station = base_station
+        self.stat_collector = stat_collector
         self.subscribed_slice_index = subscribed_slice_index
         self.usage_remaining = 0
         self.last_usage = 0
@@ -112,6 +114,7 @@ class Client:
             return True
         else:
             # TODO log block
+            self.assign_closest_base_station(exclude=[self.base_station.pk])
             print(f'[{int(self.env.now)}] Client_{self.pk} [{self.x}, {self.y}] connection refused to slice={self.get_slice()} @ {self.base_station}')
             return False
 
@@ -159,6 +162,8 @@ class Client:
                 self.base_station = b
                 print(f'[{int(self.env.now)}]Client_{self.pk} freshly assigned to {self.base_station}')
                 return
+        if KDTree.last_run_time is not int(self.env.now):
+            KDTree.run(self.stat_collector.clients, self.stat_collector.base_stations, int(self.env.now))
         self.base_station = None
 
     def __str__(self):
