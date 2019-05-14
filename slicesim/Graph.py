@@ -60,7 +60,7 @@ class Graph:
         for i in range(len(legend_indexed)):
             leg.legendHandles[i].set_color('k')
 
-    def draw_stats(self, vals, vals1, vals2, vals3, vals4):
+    def draw_stats(self, vals, vals1, vals2, vals3, vals4, vals5, vals6):
         self.ax1 = plt.subplot(self.gs[0, 1])
         self.ax1.plot(vals)
         self.ax1.set_xlim(self.xlim)
@@ -99,8 +99,21 @@ class Graph:
         self.ax5.use_sticky_edges = False
         self.ax5.set_title('Coverage Ratio')
 
+        self.ax6 = plt.subplot(self.gs[1, 2])
+        self.ax6.plot(vals5)
+        self.ax6.set_xlim(self.xlim)
+        self.ax6.set_xticks(locs)
+        self.ax6.use_sticky_edges = False
+        self.ax6.set_title('Blocks')
+
+        self.ax7 = plt.subplot(self.gs[2, 2])
+        self.ax7.plot(vals6)
+        self.ax7.set_xlim(self.xlim)
+        self.ax7.set_xticks(locs)
+        self.ax7.use_sticky_edges = False
+        self.ax7.set_title('Handovers')
+
         plt.tight_layout()
-        # TODO avg client stats
 
     def save_fig(self):
         self.fig.savefig('base_stations.png', dpi=500) #TODO set dpi

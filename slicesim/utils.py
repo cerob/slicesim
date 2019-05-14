@@ -24,7 +24,7 @@ class KDTree:
 
     # Initial connections using k-d tree
     @staticmethod
-    def run(clients, base_stations, run_at):
+    def run(clients, base_stations, run_at, assign=True):
         print(f'KDTREE CALL [{run_at}] - limit: {KDTree.limit}')
         if run_at == KDTree.last_run_time:
             return
@@ -38,6 +38,6 @@ class KDTree:
 
         # print(res[0])
         for c, d, p in zip(clients, res[0], res[1]):
-            if d[0] <= base_stations[p[0]].coverage.radius:
+            if assign and d[0] <= base_stations[p[0]].coverage.radius:
                 c.base_station = base_stations[p[0]]    
             c.closest_base_stations = [(a, base_stations[b]) for a,b in zip(d,p)]

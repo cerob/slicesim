@@ -115,6 +115,14 @@ class Client:
         else:
             # TODO log block
             self.assign_closest_base_station(exclude=[self.base_station.pk])
+            if self.base_station is not None and self.get_slice().is_avaliable():
+                # handover
+                self.stat_collector.incr_handover_count()
+            elif self.base_station is not None:
+                # block
+                self.stat_collector.incr_block_count()
+            else:
+                pass # uncovered
             print(f'[{int(self.env.now)}] Client_{self.pk} [{self.x}, {self.y}] connection refused to slice={self.get_slice()} @ {self.base_station}')
             return False
 
@@ -160,10 +168,10 @@ class Client:
         for d,b in updated_list:
             if d <= b.coverage.radius:
                 self.base_station = b
-                print(f'[{int(self.env.now)}]Client_{self.pk} freshly assigned to {self.base_station}')
+                print(f'[{int(self.env.now)}] Client_{self.pk} freshly assigned to {self.base_station}')
                 return
         if KDTree.last_run_time is not int(self.env.now):
-            KDTree.run(self.stat_collector.clients, self.stat_collector.base_stations, int(self.env.now))
+            KDTree.run(self.stat_collector.clients, self.stat_collector.base_stations, int(self.env.now), assign=False)
         self.base_station = None
 
     def __str__(self):

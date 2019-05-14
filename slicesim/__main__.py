@@ -1,10 +1,8 @@
 import math
 import os
-import sys
 import random
+import sys
 
-import matplotlib.pyplot as plt
-import numpy as np
 import simpy
 import yaml
 
@@ -17,6 +15,7 @@ from .Slice import Slice
 from .Stats import Stats
 
 from .utils import KDTree
+
 
 def get_dist(d):
     return {

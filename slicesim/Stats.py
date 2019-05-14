@@ -11,6 +11,8 @@ class Stats:
         self.avg_slice_load_ratio = []
         self.avg_slice_client_count = []
         self.coverage_ratio = []
+        self.block_count = []
+        self.handover_count = []
     
     def get_stats(self):
         return (
@@ -19,10 +21,14 @@ class Stats:
             self.avg_slice_load_ratio,
             self.avg_slice_client_count,
             self.coverage_ratio,
+            self.block_count,
+            self.handover_count,
         )
 
     def collect(self):
         yield self.env.timeout(0.25)
+        self.block_count.append(0)
+        self.handover_count.append(0)
         while True:
             self.total_connected_users.append(self.get_total_connected_users())
             self.total_used_bw.append(self.get_total_used_bw())
@@ -30,7 +36,8 @@ class Stats:
             self.avg_slice_client_count.append(self.get_avg_slice_client_count())
             self.coverage_ratio.append(self.get_coverage_ratio())
 
-            #self.graph.draw_all(*self.get_stats())
+            self.block_count.append(0)
+            self.handover_count.append(0)
             yield self.env.timeout(1)
 
     def get_total_connected_users(self):
@@ -75,10 +82,8 @@ class Stats:
                 t += 1
         return t/cc if cc !=0 else None
 
+    def incr_block_count(self):
+        self.block_count[-1] += 1
 
-
-
-# TODO
-# block count
-# handover event
-# average mobility
+    def incr_handover_count(self):
+        self.handover_count[-1] += 1
