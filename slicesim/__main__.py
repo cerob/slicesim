@@ -46,11 +46,19 @@ def get_random_slice_index(vals):
         i += 1
     return i
 
+if len(sys.argv) != 3:
+    print('Please type an input and output file.')
+    print('python -m slicesim <input-file> <output-file>')
+    exit(0)
 
 # Read YAML file
 CONF_FILENAME = os.path.join(os.path.dirname(__file__), sys.argv[1])
-with open(CONF_FILENAME, 'r') as stream:
-    data = yaml.load(stream, Loader=yaml.FullLoader)
+try:
+    with open(CONF_FILENAME, 'r') as stream:
+        data = yaml.load(stream, Loader=yaml.FullLoader)
+except FileNotFoundError:
+    print('File Not Found:',CONF_FILENAME)
+    exit(0)
 
 random.seed()
 env = simpy.Environment()
