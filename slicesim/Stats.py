@@ -7,7 +7,7 @@ class Stats:
         #self.graph = graph
 
         # Stats
-        self.total_connected_users = []
+        self.total_connected_users_ratio = []
         self.total_used_bw = []
         self.avg_slice_load_ratio = []
         self.avg_slice_client_count = []
@@ -18,7 +18,7 @@ class Stats:
     
     def get_stats(self):
         return (
-            self.total_connected_users,
+            self.total_connected_users_ratio,
             self.total_used_bw,
             self.avg_slice_load_ratio,
             self.avg_slice_client_count,
@@ -36,7 +36,7 @@ class Stats:
             self.block_count[-1] /= self.connect_attempt[-1] if self.connect_attempt[-1] != 0 else 1
             self.handover_count[-1] /= self.connect_attempt[-1] if self.connect_attempt[-1] != 0 else 1
 
-            self.total_connected_users.append(self.get_total_connected_users())
+            self.total_connected_users_ratio.append(self.get_total_connected_users_ratio_ratio())
             self.total_used_bw.append(self.get_total_used_bw())
             self.avg_slice_load_ratio.append(self.get_avg_slice_load_ratio())
             self.avg_slice_client_count.append(self.get_avg_slice_client_count())
@@ -47,15 +47,16 @@ class Stats:
             self.handover_count.append(0)
             yield self.env.timeout(1)
 
-    def get_total_connected_users(self):
-        t = 0
+    def get_total_connected_users_ratio_ratio(self):
+        t, cc = 0, 0
         for c in self.clients:
             if self.is_client_in_coverage(c):
                 t += c.connected
+                cc += 1
         # for bs in self.base_stations:
         #     for sl in bs.slices:
         #         t += sl.connected_users
-        return t
+        return t/cc if cc != 0 else 0
 
     def get_total_used_bw(self):
         t = 0

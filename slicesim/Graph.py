@@ -82,7 +82,7 @@ class Graph:
         locs[-1] = self.xlim[1]
         self.ax1.set_xticks(locs)
         self.ax1.use_sticky_edges = False
-        self.ax1.set_title(f'Total Connected Clients (out of {len(self.clients)} clients)')
+        self.ax1.set_title(f'Connected Clients Ratio')
 
         self.ax2 = plt.subplot(self.gs[1, 1])
         self.ax2.plot(vals1)
@@ -131,7 +131,7 @@ class Graph:
 
         self.ax8 = plt.subplot(self.gs[3, 2])
         row_labels = [
-            'Total number of clients',
+            'Initial number of clients',
             'Average connected clients',
             'Average bandwidth usage',
             'Average load factor of slices',
