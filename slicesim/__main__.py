@@ -98,6 +98,10 @@ for name, mb in MOBILITY_PATTERNS.items():
     mobility_pattern = Distributor(name, get_dist(mb['distribution']), *mb['params'])
     mobility_patterns.append(mobility_pattern)
 
+usage_patterns = {}
+for name, s in SLICES_INFO.items():
+    usage_patterns[name] = Distributor(name, get_dist(s['usage_pattern']['distribution']), *s['usage_pattern']['params'])
+
 base_stations = []
 i = 0
 for b in BASE_STATIONS:
@@ -110,7 +114,7 @@ for b in BASE_STATIONS:
         s = Slice(name, ratios[name], 0, s['client_weight'],
                   s['delay_tolerance'],
                   s['qos_class'], s['bandwidth_guaranteed'],
-                  s['bandwidth_max'], s_cap)
+                  s['bandwidth_max'], s_cap, usage_patterns[name])
         s.capacity = simpy.Container(env, init=s_cap, capacity=s_cap)
         slices.append(s)
     base_station = BaseStation(i, Coverage((b['x'], b['y']), b['coverage']), capacity, slices)
@@ -131,11 +135,9 @@ for i in range(NUM_CLIENTS):
 
     mobility_pattern = get_random_mobility_pattern(mb_weights, mobility_patterns)
 
-    up = CLIENTS['usage']
-    usage_pattern = Distributor(f'C_{i}_up', get_dist(up['distribution']), *up['params'])
     connected_slice_index = get_random_slice_index(slice_weights)
     c = Client(i, env, location_x, location_y,
-               mobility_pattern, usage_freq_pattern.generate_scaled(), usage_pattern, connected_slice_index, stats)
+               mobility_pattern, usage_freq_pattern.generate_scaled(), connected_slice_index, stats)
     clients.append(c)
 
 KDTree.limit = SETTINGS['limit_closest_base_stations']

@@ -6,7 +6,7 @@ from .utils import distance, KDTree
 
 class Client:
     def __init__(self, pk, env, x, y, mobility_pattern,
-                 usage_freq, usage_pattern,
+                 usage_freq,
                  subscribed_slice_index, stat_collector,
                  base_station=None):
         self.pk = pk
@@ -15,7 +15,6 @@ class Client:
         self.y = y
         self.mobility_pattern = mobility_pattern
         self.usage_freq = usage_freq
-        self.usage_pattern = usage_pattern
         self.base_station = base_station
         self.stat_collector = stat_collector
         self.subscribed_slice_index = subscribed_slice_index
@@ -94,9 +93,9 @@ class Client:
         return self.base_station.slices[self.subscribed_slice_index]
     
     def generate_usage_and_connect(self):
-        if self.usage_freq < random.random():
+        if self.usage_freq < random.random() and self.get_slice() is not None:
             # Generate a new usage
-            self.usage_remaining = self.usage_pattern.generate()
+            self.usage_remaining = self.get_slice().usage_pattern.generate()
             self.total_request_count += 1
             self.connect()
             print(f'[{int(self.env.now)}] Client_{self.pk} [{self.x}, {self.y}] requests {self.usage_remaining} usage.')
