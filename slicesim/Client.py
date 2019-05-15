@@ -103,17 +103,17 @@ class Client:
             print(f'[{int(self.env.now)}] Client_{self.pk} [{self.x}, {self.y}] requests {self.usage_remaining} usage.')
 
     def connect(self):
-        # TODO handover
         s = self.get_slice()
         if self.connected:
             return
+        # increment connect attempt
+        self.stat_collector.incr_connect_attempt()
         if s.is_avaliable():
             s.connected_users += 1
             self.connected = True
             print(f'[{int(self.env.now)}] Client_{self.pk} [{self.x}, {self.y}] connected to slice={self.get_slice()} @ {self.base_station}')
             return True
         else:
-            # TODO log block
             self.assign_closest_base_station(exclude=[self.base_station.pk])
             if self.base_station is not None and self.get_slice().is_avaliable():
                 # handover

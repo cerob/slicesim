@@ -1,11 +1,17 @@
+from statistics import mean
+
+from matplotlib import gridspec
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
-from matplotlib import gridspec
+from matplotlib.ticker import FormatStrFormatter, FuncFormatter
 import randomcolor
+
+from .utils import format_bps
 
 
 class Graph:
-    def __init__(self, base_stations, clients, xlim):
+    def __init__(self, base_stations, clients, xlim, output_filename='output.png'):
+        self.output_filename = output_filename
         self.base_stations = base_stations
         self.clients = clients
         self.xlim = xlim
@@ -36,6 +42,8 @@ class Graph:
         xlims, ylims = self.get_map_limits()
         self.ax.set_xlim(xlims)
         self.ax.set_ylim(ylims)
+        self.ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f m'))
+        self.ax.xaxis.set_major_formatter(FormatStrFormatter('%.0f m'))
         self.ax.set_aspect('equal')
         
         # base stations
@@ -55,7 +63,12 @@ class Graph:
                             color=c.base_station.color if c.base_station is not None else '0.8',
                             label=label,
                             marker=markers[c.subscribed_slice_index % len(markers)])
-        leg = self.ax.legend()
+
+        box = self.ax.get_position()
+        self.ax.set_position([box.x0 - box.width * 0.05, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
+
+        leg = self.ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+                             shadow=True, ncol=5)
 
         for i in range(len(legend_indexed)):
             leg.legendHandles[i].set_color('k')
@@ -75,6 +88,7 @@ class Graph:
         self.ax2.plot(vals1)
         self.ax2.set_xlim(self.xlim)
         self.ax2.set_xticks(locs)
+        self.ax2.yaxis.set_major_formatter(FuncFormatter(format_bps))
         self.ax2.use_sticky_edges = False
         self.ax2.set_title('Total Bandwidth Usage')
 
@@ -83,14 +97,14 @@ class Graph:
         self.ax3.set_xlim(self.xlim)
         self.ax3.set_xticks(locs)
         self.ax3.use_sticky_edges = False
-        self.ax3.set_title('Average Slice Bandwidth Load Ratio')
+        self.ax3.set_title('Bandwidth Usage Ratio in Slices (Averaged)')
 
         self.ax4 = plt.subplot(self.gs[3, 1])
         self.ax4.plot(vals3)
         self.ax4.set_xlim(self.xlim)
         self.ax4.set_xticks(locs)
         self.ax4.use_sticky_edges = False
-        self.ax4.set_title('Average Slice Client Count Ratio')
+        self.ax4.set_title('Client Count Ratio per Slice')
 
         self.ax5 = plt.subplot(self.gs[0, 2])
         self.ax5.plot(vals4)
@@ -103,20 +117,45 @@ class Graph:
         self.ax6.plot(vals5)
         self.ax6.set_xlim(self.xlim)
         self.ax6.set_xticks(locs)
+        self.ax6.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
         self.ax6.use_sticky_edges = False
-        self.ax6.set_title('Blocks')
+        self.ax6.set_title('Block ratio')
 
         self.ax7 = plt.subplot(self.gs[2, 2])
         self.ax7.plot(vals6)
         self.ax7.set_xlim(self.xlim)
         self.ax7.set_xticks(locs)
+        self.ax7.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
         self.ax7.use_sticky_edges = False
-        self.ax7.set_title('Handovers')
+        self.ax7.set_title('Handover ratio')
+
+        self.ax8 = plt.subplot(self.gs[3, 2])
+        row_labels = [
+            'Average connected clients',
+            'Average bandwidth usage',
+            'Average load factor of slices',
+            'Average coverage ratio',
+            'Average block ratio',
+            'Average handover ratio',
+        ]
+        cell_text = [
+            [f'{mean(vals):.2f} / {len(self.clients)}'],
+            [f'{mean(vals1):.2f}'],
+            [f'{mean(vals2):.2f}'],
+            [f'{mean(vals4):.2f}'],
+            [f'{mean(vals5):.0f}'],
+            [f'{mean(vals6):.0f}'],
+        ]
+        
+        self.ax8.axis('off')
+        self.ax8.axis('tight')
+        self.ax8.tick_params(axis='x', which='major', pad=15)
+        self.ax8.table(cellText=cell_text, rowLabels=row_labels, colWidths=[0.35, 0.2], loc='center right')
 
         plt.tight_layout()
 
     def save_fig(self):
-        self.fig.savefig('base_stations.png', dpi=500) #TODO set dpi
+        self.fig.savefig(self.output_filename, dpi=500) #TODO set dpi
 
     def show_plot(self):
         plt.show()

@@ -11,6 +11,7 @@ class Stats:
         self.avg_slice_load_ratio = []
         self.avg_slice_client_count = []
         self.coverage_ratio = []
+        self.connect_attempt = []
         self.block_count = []
         self.handover_count = []
     
@@ -27,15 +28,20 @@ class Stats:
 
     def collect(self):
         yield self.env.timeout(0.25)
+        self.connect_attempt.append(0)
         self.block_count.append(0)
         self.handover_count.append(0)
         while True:
+            self.block_count[-1] /= self.connect_attempt[-1] if self.connect_attempt[-1] != 0 else 1
+            self.handover_count[-1] /= self.connect_attempt[-1] if self.connect_attempt[-1] != 0 else 1
+
             self.total_connected_users.append(self.get_total_connected_users())
             self.total_used_bw.append(self.get_total_used_bw())
             self.avg_slice_load_ratio.append(self.get_avg_slice_load_ratio())
             self.avg_slice_client_count.append(self.get_avg_slice_client_count())
             self.coverage_ratio.append(self.get_coverage_ratio())
 
+            self.connect_attempt.append(0)
             self.block_count.append(0)
             self.handover_count.append(0)
             yield self.env.timeout(1)
@@ -81,6 +87,9 @@ class Stats:
             if c.base_station is not None and c.base_station.coverage.is_in_coverage(c.x, c.y):
                 t += 1
         return t/cc if cc !=0 else None
+
+    def incr_connect_attempt(self):
+        self.connect_attempt[-1] += 1
 
     def incr_block_count(self):
         self.block_count[-1] += 1
