@@ -54,10 +54,10 @@ def get_random_slice_index(vals):
         i += 1
     return i
 
-if len(sys.argv) != 3:
-    print('Please type an input and output file.')
-    print('python -m slicesim <input-file> <output-file>')
-    exit(0)
+if len(sys.argv) != 2:
+    print('Please type an input file.')
+    print('python -m slicesim <input-file>')
+    exit(1)
 
 # Read YAML file
 CONF_FILENAME = os.path.join(os.path.dirname(__file__), sys.argv[1])
@@ -65,7 +65,7 @@ try:
     with open(CONF_FILENAME, 'r') as stream:
         data = yaml.load(stream, Loader=yaml.FullLoader)
 except FileNotFoundError:
-    print('File Not Found:',CONF_FILENAME)
+    print('File Not Found:', CONF_FILENAME)
     exit(0)
 
 random.seed()
@@ -73,24 +73,24 @@ env = simpy.Environment()
 
 SETTINGS = data['settings']
 SLICES_INFO = data['slices']
-NUM_CLIENTS = SETTINGS['num_clients'] # 3
+NUM_CLIENTS = SETTINGS['num_clients']
 MOBILITY_PATTERNS = data['mobility_patterns']
 BASE_STATIONS = data['base_stations']
 CLIENTS = data['clients']
 
 if SETTINGS['logging']:
-    sys.stdout = open(sys.argv[2],'wt')
+    sys.stdout = open(SETTINGS['log_file'],'wt')
 else:
     sys.stdout = open(os.devnull, 'w')
 
 collected, slice_weights = 0, []
 for __, s in SLICES_INFO.items():
-    collected += s['weight']
+    collected += s['client_weight']
     slice_weights.append(collected)
 
 collected, mb_weights = 0, []
 for __, mb in MOBILITY_PATTERNS.items():
-    collected += mb['weight']
+    collected += mb['client_weight']
     mb_weights.append(collected)
 
 mobility_patterns = []
@@ -107,7 +107,7 @@ for b in BASE_STATIONS:
     for name, s in SLICES_INFO.items():
         s_cap = capacity * ratios[name]
         # TODO remove bandwidth max
-        s = Slice(name, ratios[name], 0, s['weight'],
+        s = Slice(name, ratios[name], 0, s['client_weight'],
                   s['delay_tolerance'],
                   s['qos_class'], s['bandwidth_guaranteed'],
                   s['bandwidth_max'], s_cap)
@@ -162,8 +162,10 @@ if SETTINGS['plotting']:
     xlim_right = int(SETTINGS['simulation_time'] * (1 - SETTINGS['statistics_params']['cooldown_ratio'])) + 1
     graph = Graph(base_stations, clients, (xlim_left, xlim_right))
     graph.draw_all(*stats.get_stats())
-    graph.save_fig()
-    graph.show_plot()
+    if SETTINGS['plot_save']:
+        graph.save_fig()
+    if SETTINGS['plot_show']:
+        graph.show_plot()
 
 sys.stdout = sys.__stdout__
-print('Simulation ran successfully and output file created as:',sys.argv[2])
+print('Simulation has ran completely and output file created to:', SETTINGS['log_file'])

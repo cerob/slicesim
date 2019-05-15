@@ -1,26 +1,30 @@
 settings:
   simulation_time: 100
-  num_clients: 10000
+  num_clients: 1000
   limit_closest_base_stations: 7
   statistics_params:
     warmup_ratio: 0.05
     cooldown_ratio: 0.05
   logging: False
+  log_file: output.txt
   plotting: True
+  plot_save: True
+  plot_show: True
+  plot_file: output.png
 slices:
   iot:
     delay_tolerance: 10
     qos_class: 2
     bandwidth_guaranteed: 10
     bandwidth_max: 10000000
-    weight: 0.5
+    client_weight: 0.5
     threshold: 0.8
   data:
     delay_tolerance: 2000
     qos_class: 4
     bandwidth_guaranteed: 1000
     bandwidth_max: 50000000
-    weight: 0.5
+    client_weight: 0.5
     threshold: 0.87
 base_stations:
   - x: 0
@@ -78,13 +82,13 @@ mobility_patterns:
     params:
       - 0
       - 1
-    weight: 0.5
+    client_weight: 0.5
   basic:
     distribution: randint
     params:
       - -1
       - 1
-    weight: 0.5
+    client_weight: 0.5
 clients:
   location:
     x:
