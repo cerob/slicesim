@@ -164,7 +164,9 @@ print(stats.get_stats())
 if SETTINGS['plotting']:
     xlim_left = int(SETTINGS['simulation_time'] * SETTINGS['statistics_params']['warmup_ratio'])
     xlim_right = int(SETTINGS['simulation_time'] * (1 - SETTINGS['statistics_params']['cooldown_ratio'])) + 1
-    graph = Graph(base_stations, clients, (xlim_left, xlim_right))
+    
+    graph = Graph(base_stations, clients, (xlim_left, xlim_right),
+                  ((x_vals['min'], x_vals['max']), (y_vals['min'], y_vals['max'])))
     graph.draw_all(*stats.get_stats())
     if SETTINGS['plot_save']:
         graph.save_fig()

@@ -43,11 +43,13 @@ class KDTree:
             c.closest_base_stations = [(a, base_stations[b]) for a,b in zip(d,p)]
 
 
-def format_bps(size, pos):
+def format_bps(size, pos=None, return_float=False):
     # https://stackoverflow.com/questions/12523586/python-format-size-application-converting-b-to-kb-mb-gb-tb
     power, n = 1000, 0
     power_labels = {0 : '', 1: 'K', 2: 'M', 3: 'G', 4: 'T'}
     while size >= power:
         size /= power
         n += 1
+    if return_float:
+        return f'{size:.3f} {power_labels[n]}bps'
     return f'{size:.0f} {power_labels[n]}bps'
