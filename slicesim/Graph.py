@@ -61,7 +61,7 @@ class Graph:
                 legend_indexed.append(c.subscribed_slice_index)
             self.ax.scatter(c.x, c.y,
                             color=c.base_station.color if c.base_station is not None else '0.8',
-                            label=label,
+                            label=label, s=15,
                             marker=markers[c.subscribed_slice_index % len(markers)])
 
         box = self.ax.get_position()
