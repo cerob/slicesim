@@ -1,8 +1,9 @@
 class Stats:
-    def __init__(self, env, base_stations, clients):
+    def __init__(self, env, base_stations, clients, area):
         self.env = env
         self.base_stations = base_stations
         self.clients = clients
+        self.area = area
         #self.graph = graph
 
         # Stats
@@ -49,7 +50,8 @@ class Stats:
     def get_total_connected_users(self):
         t = 0
         for c in self.clients:
-            t += c.connected
+            if self.is_client_in_coverage(c):
+                t += c.connected
         # for bs in self.base_stations:
         #     for sl in bs.slices:
         #         t += sl.connected_users
@@ -83,16 +85,25 @@ class Stats:
     def get_coverage_ratio(self):
         t, cc = 0, 0
         for c in self.clients:
-            cc += 1
-            if c.base_station is not None and c.base_station.coverage.is_in_coverage(c.x, c.y):
-                t += 1
+            if self.is_client_in_coverage(c):
+                cc += 1
+                if c.base_station is not None and c.base_station.coverage.is_in_coverage(c.x, c.y):
+                    t += 1
         return t/cc if cc !=0 else None
 
-    def incr_connect_attempt(self):
-        self.connect_attempt[-1] += 1
+    def incr_connect_attempt(self, client):
+        if self.is_client_in_coverage(client):
+            self.connect_attempt[-1] += 1
 
-    def incr_block_count(self):
-        self.block_count[-1] += 1
+    def incr_block_count(self, client):
+        if self.is_client_in_coverage(client):
+            self.block_count[-1] += 1
 
-    def incr_handover_count(self):
-        self.handover_count[-1] += 1
+    def incr_handover_count(self, client):
+        if self.is_client_in_coverage(client):
+            self.handover_count[-1] += 1
+
+    def is_client_in_coverage(self, client):
+        xs, ys = self.area
+        return True if xs[0] <= client.x <= xs[1] and ys[0] <= client.y <= ys[1] else False
+        

@@ -105,7 +105,7 @@ class Client:
         if self.connected:
             return
         # increment connect attempt
-        self.stat_collector.incr_connect_attempt()
+        self.stat_collector.incr_connect_attempt(self)
         if s.is_avaliable():
             s.connected_users += 1
             self.connected = True
@@ -115,10 +115,10 @@ class Client:
             self.assign_closest_base_station(exclude=[self.base_station.pk])
             if self.base_station is not None and self.get_slice().is_avaliable():
                 # handover
-                self.stat_collector.incr_handover_count()
+                self.stat_collector.incr_handover_count(self)
             elif self.base_station is not None:
                 # block
-                self.stat_collector.incr_block_count()
+                self.stat_collector.incr_block_count(self)
             else:
                 pass # uncovered
             print(f'[{int(self.env.now)}] Client_{self.pk} [{self.x}, {self.y}] connection refused to slice={self.get_slice()} @ {self.base_station}')

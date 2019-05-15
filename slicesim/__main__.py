@@ -124,7 +124,9 @@ for b in BASE_STATIONS:
 ufp = CLIENTS['usage_frequency']
 usage_freq_pattern = Distributor(f'ufp', get_dist(ufp['distribution']), *ufp['params'], divide_scale=ufp['divide_scale'])
 
-stats = Stats(env, base_stations, None)
+x_vals = SETTINGS['statistics_params']['x']
+y_vals = SETTINGS['statistics_params']['y']
+stats = Stats(env, base_stations, None, ((x_vals['min'], x_vals['max']), (y_vals['min'], y_vals['max'])))
 
 clients = []
 for i in range(NUM_CLIENTS):
