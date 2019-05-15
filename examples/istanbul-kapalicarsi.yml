@@ -13,10 +13,13 @@ settings:
       max: 1980
   logging: False
   log_file: output.txt
-  plotting: True
-  plot_save: True
-  plot_show: False
-  plot_file: output.png
+  plotting_params:
+    plotting: True
+    plot_save: True
+    plot_show: False
+    plot_file: output.png
+    plot_file_dpi: 1000
+    scatter_size: 15
 slices:
   x_eMBB:
     delay_tolerance: 10

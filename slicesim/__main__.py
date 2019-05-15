@@ -161,16 +161,19 @@ for client in clients:
 
 print(stats.get_stats())
 
-if SETTINGS['plotting']:
+if SETTINGS['plotting_params']['plotting']:
     xlim_left = int(SETTINGS['simulation_time'] * SETTINGS['statistics_params']['warmup_ratio'])
     xlim_right = int(SETTINGS['simulation_time'] * (1 - SETTINGS['statistics_params']['cooldown_ratio'])) + 1
     
     graph = Graph(base_stations, clients, (xlim_left, xlim_right),
-                  ((x_vals['min'], x_vals['max']), (y_vals['min'], y_vals['max'])))
+                  ((x_vals['min'], x_vals['max']), (y_vals['min'], y_vals['max'])),
+                  output_dpi=SETTINGS['plotting_params']['plot_file_dpi'],
+                  scatter_size=SETTINGS['plotting_params']['scatter_size'],
+                  output_filename=SETTINGS['plotting_params']['plot_file'])
     graph.draw_all(*stats.get_stats())
-    if SETTINGS['plot_save']:
+    if SETTINGS['plotting_params']['plot_save']:
         graph.save_fig()
-    if SETTINGS['plot_show']:
+    if SETTINGS['plotting_params']['plot_show']:
         graph.show_plot()
 
 sys.stdout = sys.__stdout__

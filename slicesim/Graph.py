@@ -10,12 +10,15 @@ from .utils import format_bps
 
 
 class Graph:
-    def __init__(self, base_stations, clients, xlim, map_limits, output_filename='output.png'):
+    def __init__(self, base_stations, clients, xlim, map_limits,
+                 output_dpi=500, scatter_size=15, output_filename='output.png'):
         self.output_filename = output_filename
         self.base_stations = base_stations
         self.clients = clients
         self.xlim = xlim
         self.map_limits = map_limits
+        self.output_dpi = output_dpi
+        self.scatter_size = scatter_size
         self.fig = plt.figure(figsize=(16,9))
         self.fig.canvas.set_window_title('Network Slicing Simulation')
 
@@ -159,7 +162,7 @@ class Graph:
         plt.tight_layout()
 
     def save_fig(self):
-        self.fig.savefig(self.output_filename, dpi=500) #TODO set dpi
+        self.fig.savefig(self.output_filename, dpi=1000)
 
     def show_plot(self):
         plt.show()
