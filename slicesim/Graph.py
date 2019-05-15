@@ -49,7 +49,7 @@ class Graph:
         # base stations
         for bs in self.base_stations:
             circle = plt.Circle(bs.coverage.center, bs.coverage.radius,
-                                fill=False, linewidth=5, alpha=0.9, color=bs.color)
+                                fill=False, linewidth=2, alpha=0.9, color=bs.color)
             self.ax.add_artist(circle)
         
         # clients
@@ -131,6 +131,7 @@ class Graph:
 
         self.ax8 = plt.subplot(self.gs[3, 2])
         row_labels = [
+            'Total number of clients',
             'Average connected clients',
             'Average bandwidth usage',
             'Average load factor of slices',
@@ -139,12 +140,13 @@ class Graph:
             'Average handover ratio',
         ]
         cell_text = [
-            [f'{mean(vals):.2f} / {len(self.clients)}'],
+            [f'{len(self.clients)}'],
+            [f'{mean(vals):.2f}'],
             [f'{mean(vals1):.2f}'],
             [f'{mean(vals2):.2f}'],
             [f'{mean(vals4):.2f}'],
-            [f'{mean(vals5):.0f}'],
-            [f'{mean(vals6):.0f}'],
+            [f'{mean(vals5):.4f}'],
+            [f'{mean(vals6):.4f}'],
         ]
         
         self.ax8.axis('off')

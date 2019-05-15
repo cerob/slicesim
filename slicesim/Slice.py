@@ -14,12 +14,10 @@ class Slice:
         self.capacity = 0
     
     def get_consumable_share(self):
-        real_cap = min(self.init_capacity, self.bandwidth_max)
-
         if self.connected_users <= 0:
-            return real_cap
+            return min(self.init_capacity, self.bandwidth_max)
         else:
-            return real_cap / self.connected_users
+            return min(self.init_capacity/self.connected_users, self.bandwidth_max)
 
     def is_avaliable(self):
         real_cap = min(self.init_capacity, self.bandwidth_max)
