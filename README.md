@@ -1,5 +1,4 @@
 # SliceSim: A Simulation Suite for Network Slicing in 5G Networks
----
 **Abdurrahman Dilmaç** (abdurrahman.d _at_ icloud _dot_ com)  
 **Muhammed Emin Güre** (memingure _at_ gmail _dot_ com)  
 *Project Advisor:* **Prof. Tuna Tuğcu**
