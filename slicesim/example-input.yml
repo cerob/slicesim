@@ -5,12 +5,24 @@ settings:
   statistics_params:
     warmup_ratio: 0.05
     cooldown_ratio: 0.05
+    # Statistic collection will be in this area of the coordinate system
+    x:
+      min: 0
+      max: 1980
+    y:
+      min: 0
+      max: 1980
   logging: False
   log_file: output.txt
-  plotting: True
-  plot_save: True
-  plot_show: True
-  plot_file: output.png
+  
+  plotting_params:
+    plotting: True # plot the statistics after execution
+    plot_save: True # save plot as image
+    plot_show: True # show plot after execution
+    plot_file: output.png # name of the plot image
+    plot_file_dpi: 1000 # dots per inch for plot image
+    scatter_size: 15  
+  
 slices:
   iot:
     delay_tolerance: 10
@@ -19,6 +31,11 @@ slices:
     bandwidth_max: 10000000
     client_weight: 0.5
     threshold: 0.8
+    usage_pattern:
+      distribution: randint # distribution name
+      params: # distribution parameters
+        - 4000000 # min value for this example
+        - 800000000 # max value for this example
   data:
     delay_tolerance: 2000
     qos_class: 4
@@ -26,6 +43,11 @@ slices:
     bandwidth_max: 50000000
     client_weight: 0.5
     threshold: 0.87
+    usage_pattern:
+      distribution: randint # distribution name
+      params: # distribution parameters
+        - 4000000 # min value for this example
+        - 800000000 # max value for this example
 base_stations:
   - x: 0
     y: 0
