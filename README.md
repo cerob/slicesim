@@ -118,6 +118,8 @@ clients:
 ```
 
 ### Usage
+Python 3 is required with required dependencies listed in `requirements.txt` installed. Please do not send us email if you haven't done this.
+
 ```bash
 python -m slicesim <input-file.yml>
 ```
